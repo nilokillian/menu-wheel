@@ -1,6 +1,7 @@
 import * as React from "react";
 import { IMenuWheelProps } from "./IMenuWheelProps";
 import * as Chart from "chart.js";
+import "chartjs-plugin-labels";
 
 export const MenuWheel: React.FC<IMenuWheelProps> = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>();
@@ -37,6 +38,15 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
         new Chart(ctx, {
           type: "doughnut",
           data: {
+            // labels: [
+            //   "IT/Technology",
+            //   "Business Services",
+            //   "Business Finance, Analytics & Reporting",
+            //   "Corporate Finance & Governance",
+            //   "Procurement",
+            //   "Property",
+            //   "Legal"
+            // ],
             datasets: [
               {
                 data: [
@@ -167,18 +177,26 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
                 }
               }
             },
-            labels: {
-              callbacks: {
-                label: (tooltipItem: any, data: any) => {
-                  console.log("data", data);
-                  var dataset = data.datasets[tooltipItem.datasetIndex];
-                  var index = tooltipItem.index;
-                  return dataset.labels[index] + ": " + dataset.data[index];
-                }
-              }
-            },
+
             plugins: {
-              labels: { render: "value" }
+              // labels: {
+              //   render: "label",
+              //   arc: true,
+              //   position: "border",
+              //   fontSize: 12,
+              //   fontColor: "#fff",
+              //   textShadow: true
+              // }
+              labels: {
+                render: function(args) {
+                  console.log("args", args);
+
+                  //return args.dataset.labels;
+
+                  //return "$" + args.value;
+                },
+                arc: true
+              }
               // datalabels: {
               //   color: "#111",
               //   textAlign: "center",
