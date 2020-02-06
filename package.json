@@ -25,7 +25,8 @@
     "chartjs-plugin-labels": "^1.1.0",
     "office-ui-fabric-react": "6.189.2",
     "react": "16.8.5",
-    "react-dom": "16.8.5"
+    "react-dom": "16.8.5",
+    "react-icons": "^3.9.0"
   },
   "resolutions": {
     "@types/react": "16.8.8"
