@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDom from "react-dom";
 import { Version } from "@microsoft/sp-core-library";
+import { SPComponentLoader } from "@microsoft/sp-loader";
 import {
   BaseClientSideWebPart,
   IPropertyPaneConfiguration,
@@ -35,6 +36,14 @@ export default class MenuWheelWebPart extends BaseClientSideWebPart<
 
   protected get dataVersion(): Version {
     return Version.parse("1.0");
+  }
+
+  protected async onInit(): Promise<void> {
+    await super.onInit();
+
+    SPComponentLoader.loadCss(
+      "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    );
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {

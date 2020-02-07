@@ -1,21 +1,33 @@
 import * as React from "react";
-import * as ReactDOM from "react";
 import { IMenuWheelProps } from "./IMenuWheelProps";
 import * as Chart from "chart.js";
 import "chartjs-plugin-labels";
-import { initializeIcons } from "@uifabric/icons";
-import { FaBeer } from "react-icons/fa";
-
-const logo: HTMLImageElement = require("../images/Downer-Group-Logo.png");
+import {
+  ActionButton,
+  ContextualMenuItemType,
+  DirectionalHint,
+  Callout
+} from "office-ui-fabric-react";
 
 export const MenuWheel: React.FC<IMenuWheelProps> = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>();
+  const contextualMenuDialogRef = React.useRef();
+
+  const [contextualMenuDialog, setContextualMenuDialog] = React.useState(false);
+  const [directionalHint, setDirectionalHint] = React.useState<
+    0 | 2 | 1 | 12 | 6 | 5 | 7 | 8 | 4 | 13 | 3 | 9 | 10 | 11
+  >(12);
+
   const [ctx, setCtx] = React.useState();
   const [menu, setMenu] = React.useState();
-  initializeIcons();
-  // React.useEffect(() => {
-  //   initializeIcons();
-  // }, []);
+
+  const getDirectionalHint = (x: number): number => {
+    if (x >= 712 && x <= 1252) {
+      return 1;
+    }
+
+    return 12;
+  };
 
   React.useEffect(() => {
     if (canvasRef) {
@@ -30,11 +42,13 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
           var width = chart.width,
             height = chart.height,
             ctx = chart.ctx;
-
+          //ctx.imageSmoothingEnabled = true;
           ctx.restore();
           var fontSize = (height / 114).toFixed(2);
-          ctx.font = fontSize + "em sans-serif";
+          //ctx.font = fontSize + "em sans-serif";
+          ctx.font = '900 14px "FontAwesome"';
           ctx.textBaseline = "middle";
+          // ctx.fillText("\uf72e", 10, 10);
 
           // var text = "75%",
           //   textX = Math.round((width - ctx.measureText(text).width) / 2),
@@ -46,11 +60,12 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
           let imageY = height / 2;
           console.log("imageY", imageY);
           // ctx.fillText(text, textX, textY);
-          ctx.drawImage(image, 280, imageY - 55, 200, 110);
+          // ctx.drawImage(image, 260, imageY - 55, 200, 110);
           ctx.save();
         }
       });
 
+      console.log("menu", menu);
       canvasRef.current.onclick = evt => {
         var activePoints = menu.getElementsAtEvent(evt);
 
@@ -60,10 +75,13 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
         var label = chartData.labels[idx];
         var value = chartData.datasets[0].data[idx];
 
-        console.log("datasets[0]", chartData.datasets[0]);
-      };
+        setDirectionalHint(getDirectionalHint(evt.x) as any);
+        setContextualMenuDialog(true);
 
-      console.log("menu", menu);
+        activePoints[0]["_chart"]["_labels"];
+
+        console.log("activePoints ", activePoints);
+      };
     }
   }, [menu]);
 
@@ -168,7 +186,7 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
                 borderWidth: 7
               },
               {
-                data: [8.2, 11.4, 5, 12, 5, 8, 8],
+                data: [8.2, 11.5, 5.2, 12, 5, 8, 8],
                 backgroundColor: [
                   "rgba(255, 203, 102, 0.7)",
                   "rgba(126, 203, 190, 0.7)",
@@ -192,13 +210,16 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
               }
             ]
           },
+          // plugins: [ChartDataLabels],
           options: {
             responsive: true,
             cutoutPercentage: 30,
+            events: ["click"],
             legend: {
               display: false
             },
             tooltips: {
+              displayColors: false,
               callbacks: {
                 label: (tooltipItem: any, data: any) => {
                   const dataset = data.datasets[tooltipItem.datasetIndex];
@@ -209,21 +230,33 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
             },
 
             plugins: {
-              labels: {
-                fontColor: "#fff",
-                textShadow: true,
-                textMargin: 4,
-                render: (args: any) => {
-                  return {
-                    src:
-                      "https://img.icons8.com/ios-filled/50/000000/cloudflare.png",
-                    width: 16,
-                    height: 16
-                  };
+              labels: [
+                {
+                  fontColor: "#fff",
+                  textMargin: -7,
+                  textShadow: true,
+                  fontFamily: "FontAwesome",
+                  fontSize: 19,
+                  borderColor: "#eee",
+                  border: 1,
 
-                  //return args.dataset.labels[args.index].split(" ").join("\n");
+                  render: () => "\uf055",
+                  click: e => {
+                    alert(e);
+                  },
+                  position: "outside"
+                },
+                {
+                  textMargin: 4,
+                  textShadow: true,
+                  fontColor: "#fff",
+                  onClick: e => {
+                    alert(e);
+                  },
+                  render: (args: any) =>
+                    args.dataset.labels[args.index].split(" ").join("\n")
                 }
-              }
+              ]
             }
           }
         } as any)
@@ -247,12 +280,34 @@ export const MenuWheel: React.FC<IMenuWheelProps> = () => {
           width: 150,
           backgroundColor: "#bbb",
           borderRadius: "50%",
-          display: "inline-block"
+          display: "inline-block",
+          verticalAlign: "middle"
         }}
       ></div>
+
+      {contextualMenuDialog && (
+        <Callout
+          gapSpace={0}
+          target={canvasRef.current}
+          onDismiss={() => setContextualMenuDialog(false)}
+          setInitialFocus={true}
+          isBeakVisible={false}
+          directionalHint={directionalHint}
+        >
+          Test
+        </Callout>
+      )}
     </div>
   );
 };
+
+// style={{
+//   verticalAlign: "middle",
+//   textAlign: "center",
+//   left: "10%",
+//   position: "relative" /*makes left effective*/,
+//   display: "table-cell"
+// }}
 
 // <div classNameNameName={ styles.menuWheel }>
 // <div classNameNameName={ styles.container }>
